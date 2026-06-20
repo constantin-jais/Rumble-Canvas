@@ -36,6 +36,14 @@ Expected next evidence:
 
 Dogfooding claims should stay backed by visible commands, fixtures, CI workflows, generated reports, or linked docs.
 
+## Contributing
+
+See:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines;
+- [ROADMAP.md](ROADMAP.md) for current contribution priorities;
+- [issue templates](.github/ISSUE_TEMPLATE/) for bugs, docs issues, fixture/example requests, and design discussions.
+
 ## Usable today
 
 The local Rust CLI can create a sample workspace, build a package and handoff, validate it, and produce a dry-run plan through `cosmatic`.
