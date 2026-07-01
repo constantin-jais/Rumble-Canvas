@@ -238,7 +238,7 @@ mod tests {
         let package = build_package(&workspace).unwrap();
         let handoff = build_handoff(&workspace, &package).unwrap();
         assert_eq!(handoff.format, "canvas.bolt_handoff.v0.1");
-        assert_eq!(handoff.execution_policy.allow_execution, false);
+        assert!(!handoff.execution_policy.allow_execution);
         assert!(handoff.payload_hash.unwrap().starts_with("sha256:"));
     }
 
