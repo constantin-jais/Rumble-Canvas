@@ -1,6 +1,12 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
+pub mod role_assignment;
+pub mod workspace_membership;
+
+pub use role_assignment::{validate_actor_permissions, RoleAssignment, RoleValidationError};
+pub use workspace_membership::{MembershipStatus, WorkspaceMembership};
+
 pub const SAMPLE_TS: &str = "2026-06-30T00:00:00Z";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -16,8 +22,20 @@ pub struct ActorReference {
 pub enum ActorType {
     Human,
     Agent,
-    System,
+    Service,
     External,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PermissionPrimitive {
+    Read,
+    Comment,
+    Write,
+    Approve,
+    Invite,
+    Administer,
+    Delegate,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -93,7 +111,7 @@ pub struct RoleDefinition {
     pub id: String,
     pub name: String,
     pub actor_type: String,
-    pub permissions: Vec<String>,
+    pub permissions: Vec<PermissionPrimitive>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -177,6 +195,7 @@ pub struct SpecWorkspace {
     pub open_questions: Vec<OpenQuestion>,
     pub risks: Vec<RiskFlag>,
     pub capability_candidates: Vec<CapabilityCandidate>,
+    pub memberships: Vec<WorkspaceMembership>,
     pub sections: Vec<SpecSection>,
 }
 
@@ -202,7 +221,11 @@ pub fn sample_workspace() -> SpecWorkspace {
         id: "role:owner".to_string(),
         name: "Owner".to_string(),
         actor_type: "human".to_string(),
-        permissions: vec!["approve_package".to_string(), "prepare_handoff".to_string()],
+        permissions: vec![
+            PermissionPrimitive::Read,
+            PermissionPrimitive::Write,
+            PermissionPrimitive::Approve,
+        ],
     };
     let journey = JourneyDefinition {
         id: "journey:package-to-handoff".to_string(),
@@ -238,6 +261,29 @@ pub fn sample_workspace() -> SpecWorkspace {
     let criteria = vec![
         "Given a valid package, handoff validation succeeds".to_string(),
         "Given allow_execution true, handoff validation fails".to_string(),
+    ];
+    let memberships = vec![
+        WorkspaceMembership {
+            id: "member:owner".to_string(),
+            workspace_id: "workspace:rumble-canvas-mvp".to_string(),
+            actor_ref: actor.clone(),
+            status: MembershipStatus::Active,
+            joined_at: SAMPLE_TS.to_string(),
+            revoked_at: None,
+        },
+        WorkspaceMembership {
+            id: "member:contributor".to_string(),
+            workspace_id: "workspace:rumble-canvas-mvp".to_string(),
+            actor_ref: ActorReference {
+                actor_id: "actor:contributor".to_string(),
+                actor_type: ActorType::Human,
+                display_name: Some("Contributor Alice".to_string()),
+                source: Some("local_profile".to_string()),
+            },
+            status: MembershipStatus::Active,
+            joined_at: SAMPLE_TS.to_string(),
+            revoked_at: None,
+        },
     ];
     let sections = vec![section(
         "section:charter",
@@ -286,6 +332,7 @@ pub fn sample_workspace() -> SpecWorkspace {
             status: "accepted".to_string(),
             rationale: "Needed to connect product packages to harness planning safely".to_string(),
         }],
+        memberships,
         sections,
     }
 }
