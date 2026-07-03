@@ -58,7 +58,7 @@ Stabilize the `SpecPackage` contract and wire Wrench checks so a Canvas handoff 
 
 ## Purpose
 
-`rumble-canvas` is the product-conception workspace of the Rumble/Bolt/Wrench/Gear ecosystem.
+`rumble-canvas` is the product-conception workspace of the Rumble/Portal/Bolt/Wrench/Gear ecosystem.
 
 The product is not “draw a UI from a prompt”. The product is **industrialized product conception**: teams discuss a need, clarify ambiguity, map roles and screens, generate specs, and produce artifacts that the agentic harness can implement safely.
 
@@ -79,7 +79,9 @@ The product is not “draw a UI from a prompt”. The product is **industrialize
 ## Allowed Dependencies
 
 - Uses `cos-matic` to turn validated specs into execution plans.
-- Uses Wrench tools to ingest context, inspect designs, and validate generated artifacts.
+- Uses Gear Loader to ingest context and source material when needed.
+- Uses Wrench tools to inspect designs and validate generated artifacts.
+- Uses Portal when Canvas needs reusable client-platform primitives, tokens, accessibility, or native/web adapters.
 - Uses Gear for local-first persistence, provenance, artifact storage, and reproducible delivery.
 
 ## Product Vision Challenge
