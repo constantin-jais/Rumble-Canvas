@@ -1,23 +1,24 @@
-# Rumble Canvas
+# rumble-canvas
 
-**Layer:** Rumble — Product  
-**Role:** product conception workspace  
-**Mission:** turn product conversations into shared understanding, specs, screens, and implementation-ready deliverables.
+**Couche** : Rumble
+**Rôle** : workspace de conception produit vers specs, écrans et handoff
+**deployment_class** : product-linkable
+**Maturité** : contract-first — handoff CLI prouvé ; workspace complet encore absent
+**Place dans la chaîne DoD** : transforme une conversation produit en `SpecPackage` et handoff planning-only pour Bolt, avec preuves Gear/Wrench à compléter.
+**Doctrine** : le produit exprime le sens ; Bolt orchestre, Wrench inspecte, Gear persiste.
+**Souveraineté** : licences MIT/Apache/MPL compatibles ; pas d’AGPL/SSPL dans la chaîne versionnée.
+
+## Ce que ça fait
+
+Structure décisions, hypothèses, écrans et livrables pour rendre une idée implémentable sans sauter les gates. Le chemin CLI/handoff existe ; le produit multi-utilisateur et les inspections complètes restent les prochains incréments.
+
+## Où ça se branche
+
+- Amont : discussion produit et specs dans [ecosystem/specs/rumble-canvas](https://github.com/constantin-jais/constantin-jais/tree/main/ecosystem/specs/rumble-canvas).
+- Aval : [bolt-cos-matic](https://github.com/constantin-jais/bolt-cos-matic) via handoff, [gear-memory](https://github.com/constantin-jais/gear-memory) pour provenance, [wrench-inspect](https://github.com/constantin-jais/wrench-inspect) pour complétude.
+- Contrats : `canvas.bolt_handoff.v0.1`, `SpecPackage` en stabilisation.
 
 ---
-
-## Stack role
-
-- **Layer:** Rumble — Product.
-- **Role:** product conception workspace.
-- **Mission:** turn product conversations into shared understanding, specs, screens, and implementation-ready deliverables.
-- **Maturity:** `contract-first`.
-- **Scale-ready:** no — the repo proves contracts and a local CLI handoff, not a full multi-user product.
-- **Current increment:** P0 contract.
-- **Learning value:** specification, ambiguity, decisions, traceability, and implementation handoff.
-- **Next quality step:** complete the `SpecPackage` schema and add Wrench completeness checks.
-
-See the ecosystem cockpit in [`constantin-jais/ecosystem/status.md`](https://github.com/constantin-jais/constantin-jais/blob/main/ecosystem/status.md).
 
 ## Dogfooding
 
@@ -71,14 +72,14 @@ The product is not “draw a UI from a prompt”. The product is **industrialize
 
 ## Does Not Own
 
-- Agent execution and safe-write policy: belongs to `cos-matic`.
-- Raw document extraction: belongs to Wrench.
+- Agent execution and safe-write policy: belongs to `bolt-cos-matic`.
+- Raw document extraction: belongs to `gear-loader`.
 - Persistent memory/search substrate: belongs to Gear.
 - Generic visual design or Figma-like editing as the primary product.
 
 ## Allowed Dependencies
 
-- Uses `cos-matic` to turn validated specs into execution plans.
+- Uses `bolt-cos-matic` to turn validated specs into execution plans.
 - Uses Gear Loader to ingest context and source material when needed.
 - Uses Wrench tools to inspect designs and validate generated artifacts.
 - Uses Portal when Canvas needs reusable client-platform primitives, tokens, accessibility, or native/web adapters.
