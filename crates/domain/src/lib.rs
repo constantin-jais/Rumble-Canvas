@@ -1,6 +1,12 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
+pub mod role_assignment;
+pub mod workspace_membership;
+
+pub use role_assignment::{validate_actor_permissions, RoleAssignment, RoleValidationError};
+pub use workspace_membership::{MembershipStatus, WorkspaceMembership};
+
 pub const SAMPLE_TS: &str = "2026-06-30T00:00:00Z";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -16,8 +22,28 @@ pub struct ActorReference {
 pub enum ActorType {
     Human,
     Agent,
-    System,
+    Service,
     External,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PermissionPrimitive {
+    Read,
+    Comment,
+    Write,
+    Approve,
+    Invite,
+    Administer,
+    Delegate,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct WorkspaceIdentity {
+    pub workspace_id: String,
+    pub tenant_id: String,
+    pub memberships: Vec<WorkspaceMembership>,
+    pub role_assignments: Vec<RoleAssignment>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -93,7 +119,7 @@ pub struct RoleDefinition {
     pub id: String,
     pub name: String,
     pub actor_type: String,
-    pub permissions: Vec<String>,
+    pub permissions: Vec<PermissionPrimitive>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -160,6 +186,7 @@ pub struct OpenQuestion {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SpecWorkspace {
     pub id: String,
+    pub tenant_id: String,
     pub name: String,
     pub slug: String,
     pub status: String,
@@ -177,7 +204,20 @@ pub struct SpecWorkspace {
     pub open_questions: Vec<OpenQuestion>,
     pub risks: Vec<RiskFlag>,
     pub capability_candidates: Vec<CapabilityCandidate>,
+    pub memberships: Vec<WorkspaceMembership>,
+    pub role_assignments: Vec<RoleAssignment>,
     pub sections: Vec<SpecSection>,
+}
+
+impl SpecWorkspace {
+    pub fn workspace_identity(&self) -> WorkspaceIdentity {
+        WorkspaceIdentity {
+            workspace_id: self.id.clone(),
+            tenant_id: self.tenant_id.clone(),
+            memberships: self.memberships.clone(),
+            role_assignments: self.role_assignments.clone(),
+        }
+    }
 }
 
 pub fn sample_actor() -> ActorReference {
@@ -191,6 +231,8 @@ pub fn sample_actor() -> ActorReference {
 
 pub fn sample_workspace() -> SpecWorkspace {
     let actor = sample_actor();
+    let workspace_id = "workspace:rumble-canvas-mvp".to_string();
+    let tenant_id = "tenant:rumble-canvas-local".to_string();
     let charter = ProductCharter {
         mission: "Produce a planning-only implementation handoff from a structured spec package"
             .to_string(),
@@ -202,7 +244,11 @@ pub fn sample_workspace() -> SpecWorkspace {
         id: "role:owner".to_string(),
         name: "Owner".to_string(),
         actor_type: "human".to_string(),
-        permissions: vec!["approve_package".to_string(), "prepare_handoff".to_string()],
+        permissions: vec![
+            PermissionPrimitive::Read,
+            PermissionPrimitive::Write,
+            PermissionPrimitive::Approve,
+        ],
     };
     let journey = JourneyDefinition {
         id: "journey:package-to-handoff".to_string(),
@@ -239,6 +285,38 @@ pub fn sample_workspace() -> SpecWorkspace {
         "Given a valid package, handoff validation succeeds".to_string(),
         "Given allow_execution true, handoff validation fails".to_string(),
     ];
+    let memberships = vec![
+        WorkspaceMembership {
+            id: "member:owner".to_string(),
+            workspace_id: workspace_id.clone(),
+            actor_ref: actor.clone(),
+            status: MembershipStatus::Active,
+            joined_at: SAMPLE_TS.to_string(),
+            revoked_at: None,
+        },
+        WorkspaceMembership {
+            id: "member:contributor".to_string(),
+            workspace_id: workspace_id.clone(),
+            actor_ref: ActorReference {
+                actor_id: "actor:contributor".to_string(),
+                actor_type: ActorType::Human,
+                display_name: Some("Contributor Alice".to_string()),
+                source: Some("local_profile".to_string()),
+            },
+            status: MembershipStatus::Active,
+            joined_at: SAMPLE_TS.to_string(),
+            revoked_at: None,
+        },
+    ];
+    let role_assignments = vec![RoleAssignment {
+        id: "role_assignment:owner".to_string(),
+        workspace_id: workspace_id.clone(),
+        actor_ref: actor.clone(),
+        role: "owner".to_string(),
+        permissions: role.permissions.clone(),
+        created_at: SAMPLE_TS.to_string(),
+        revoked_at: None,
+    }];
     let sections = vec![section(
         "section:charter",
         "product-charter",
@@ -247,7 +325,8 @@ pub fn sample_workspace() -> SpecWorkspace {
         &actor,
     )];
     SpecWorkspace {
-        id: "workspace:rumble-canvas-mvp".to_string(),
+        id: workspace_id.clone(),
+        tenant_id,
         name: "Rumble Canvas MVP".to_string(),
         slug: "rumble-canvas-mvp".to_string(),
         status: "approved".to_string(),
@@ -286,6 +365,8 @@ pub fn sample_workspace() -> SpecWorkspace {
             status: "accepted".to_string(),
             rationale: "Needed to connect product packages to harness planning safely".to_string(),
         }],
+        memberships,
+        role_assignments,
         sections,
     }
 }

@@ -37,12 +37,6 @@ impl Default for ExecutionPolicy {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ActorReference {
-    pub actor_id: String,
-    pub actor_type: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ImplementationHandoff {
     pub format: String,
     pub kind: String,
