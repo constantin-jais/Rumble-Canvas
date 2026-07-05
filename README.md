@@ -1,6 +1,6 @@
 # rumble-canvas
 
-**Couche** : Rumble
+**Outil** : Rumble
 **Rôle** : workspace de conception produit vers specs, écrans et handoff
 **deployment_class** : product-linkable
 **Maturité** : contract-first — handoff CLI prouvé ; workspace complet encore absent
@@ -22,7 +22,7 @@ Structure décisions, hypothèses, écrans et livrables pour rendre une idée im
 
 ## Dogfooding
 
-This repository is part of the forge dogfooding loop: the ecosystem should use its own tools to make specs, maturity, contracts, releases, and product documentation observable.
+This repository is part of the Daidalos dogfooding loop: the ecosystem should use its own tools to make specs, maturity, contracts, releases, and product documentation observable.
 
 Current visible evidence:
 
