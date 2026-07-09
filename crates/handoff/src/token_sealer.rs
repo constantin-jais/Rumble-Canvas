@@ -106,7 +106,8 @@ fn mock_scope_hash(tenant_id: &str, workspace_id: &str, key_material: &[u8]) -> 
     let facts = format!("{tenant_id}|{workspace_id}|{key_hex}");
     let mut hasher = Sha256::new();
     hasher.update(facts.as_bytes());
-    format!("{:x}", hasher.finalize())
+    let digest = hasher.finalize();
+    digest.iter().map(|b| format!("{:02x}", b)).collect()
 }
 
 fn mock_actor_hash(actor_id: &str, role: &str) -> String {
@@ -115,7 +116,8 @@ fn mock_actor_hash(actor_id: &str, role: &str) -> String {
     let facts = format!("{actor_id}|{role}");
     let mut hasher = Sha256::new();
     hasher.update(facts.as_bytes());
-    format!("{:x}", hasher.finalize())
+    let digest = hasher.finalize();
+    digest.iter().map(|b| format!("{:02x}", b)).collect()
 }
 
 fn perm_to_string(perm: &PermissionPrimitive) -> &'static str {

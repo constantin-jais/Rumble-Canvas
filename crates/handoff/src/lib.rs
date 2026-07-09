@@ -179,7 +179,9 @@ pub fn payload_hash(handoff: &ImplementationHandoff) -> String {
     let mut clone = handoff.clone();
     clone.payload_hash = None;
     let bytes = serde_json::to_vec(&clone).expect("handoff serializes");
-    format!("sha256:{:x}", Sha256::digest(bytes))
+    let digest = Sha256::digest(&bytes);
+    let hex: String = digest.iter().map(|b| format!("{:02x}", b)).collect();
+    format!("sha256:{}", hex)
 }
 
 fn has_accepted_waiver(waivers: &Value) -> bool {

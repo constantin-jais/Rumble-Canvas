@@ -139,7 +139,9 @@ pub fn compute_package_hash(package: &SpecPackage) -> String {
         readiness: &package.readiness,
     };
     let bytes = serde_json::to_vec(&view).expect("hash view serializes");
-    format!("sha256:{:x}", Sha256::digest(bytes))
+    let digest = Sha256::digest(&bytes);
+    let hex: String = digest.iter().map(|b| format!("{:02x}", b)).collect();
+    format!("sha256:{}", hex)
 }
 
 #[cfg(test)]
@@ -171,6 +173,23 @@ mod tests {
         assert_eq!(
             package.add_item(item).unwrap_err(),
             PackageError::ImmutableAfterApproval
+        );
+    }
+
+    #[test]
+    fn sha256_hash_format_regression_golden() {
+        // Golden test: verify SHA256 digest format is stable.
+        // This prevents regressions in the sha2 0.11 migration where
+        // output type no longer implements LowerHex.
+        // Expected output for "golden test payload" is verified via:
+        //   echo -n "golden test payload" | sha256sum
+        let payload = b"golden test payload";
+        let digest = Sha256::digest(payload);
+        let hex: String = digest.iter().map(|b| format!("{:02x}", b)).collect();
+        let result = format!("sha256:{}", hex);
+        assert_eq!(
+            result,
+            "sha256:68f2e7eb43975fb21deeee23a698c5c2ec1d9f6989b904344c9920da42538650"
         );
     }
 }
