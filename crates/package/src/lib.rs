@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
+pub mod schema;
+
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum PackageError {
     #[error("approved package is immutable")]
@@ -31,6 +33,39 @@ pub struct PackageReadinessSnapshot {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PackageMetadata {
+    pub created_by: String,
+    pub created_at: String,
+    pub updated_at: String,
+    pub description: Option<String>,
+    pub tags: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ApprovalRecord {
+    pub approved_by: String,
+    pub approved_at: String,
+    pub approval_type: String,
+    pub comment: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct PackageReadinessDetails {
+    pub required_sections_complete: bool,
+    pub all_sections_approved: bool,
+    pub traceability_density: f64,
+    pub blocking_risks_resolved: bool,
+    pub validation_passed: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DeliveryTarget {
+    pub handoff_format: String,
+    pub bolt_target: String,
+    pub expected_consumer: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SpecPackage {
     pub package_id: String,
     pub workspace_id: String,
@@ -40,6 +75,10 @@ pub struct SpecPackage {
     pub approved_at: Option<String>,
     pub package_hash: String,
     pub artifact_reference_id: Option<String>,
+    pub metadata: PackageMetadata,
+    pub approval_chain: Vec<ApprovalRecord>,
+    pub package_readiness_details: PackageReadinessDetails,
+    pub delivery_target: DeliveryTarget,
     pub items: Vec<SpecPackageItem>,
     pub readiness: PackageReadinessSnapshot,
 }
@@ -79,6 +118,26 @@ pub fn build_package(workspace: &SpecWorkspace) -> Result<SpecPackage, PackageEr
         approved_at: None,
         package_hash: String::new(),
         artifact_reference_id: Some("artifact:sample-package".to_string()),
+        metadata: PackageMetadata {
+            created_by: workspace.owner.actor_id.clone(),
+            created_at: SAMPLE_TS.to_string(),
+            updated_at: SAMPLE_TS.to_string(),
+            description: Some("Canvas MVP package — specification handoff".to_string()),
+            tags: vec!["canvas".to_string(), "mvp".to_string()],
+        },
+        approval_chain: vec![],
+        package_readiness_details: PackageReadinessDetails {
+            required_sections_complete: true,
+            all_sections_approved: false,
+            traceability_density: 1.0,
+            blocking_risks_resolved: true,
+            validation_passed: false,
+        },
+        delivery_target: DeliveryTarget {
+            handoff_format: "canvas.bolt_handoff.v0.1".to_string(),
+            bolt_target: "cos-matic".to_string(),
+            expected_consumer: "cos-matic".to_string(),
+        },
         items: workspace.sections.iter().map(package_item).collect(),
         readiness: PackageReadinessSnapshot {
             status: "ready".to_string(),
@@ -124,6 +183,10 @@ pub fn compute_package_hash(package: &SpecPackage) -> String {
         approved_by: &'a Option<String>,
         approved_at: &'a Option<String>,
         artifact_reference_id: &'a Option<String>,
+        metadata: &'a PackageMetadata,
+        approval_chain: &'a [ApprovalRecord],
+        package_readiness_details: &'a PackageReadinessDetails,
+        delivery_target: &'a DeliveryTarget,
         items: &'a [SpecPackageItem],
         readiness: &'a PackageReadinessSnapshot,
     }
@@ -135,6 +198,10 @@ pub fn compute_package_hash(package: &SpecPackage) -> String {
         approved_by: &package.approved_by,
         approved_at: &package.approved_at,
         artifact_reference_id: &package.artifact_reference_id,
+        metadata: &package.metadata,
+        approval_chain: &package.approval_chain,
+        package_readiness_details: &package.package_readiness_details,
+        delivery_target: &package.delivery_target,
         items: &package.items,
         readiness: &package.readiness,
     };

@@ -1,0 +1,198 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SpecPackage v0.1",
+  "description": "Schema for Canvas SpecPackage delivery contracts",
+  "type": "object",
+  "required": [
+    "package_id",
+    "workspace_id",
+    "version",
+    "status",
+    "package_hash",
+    "metadata",
+    "delivery_target",
+    "items",
+    "readiness"
+  ],
+  "properties": {
+    "package_id": {
+      "type": "string",
+      "description": "Unique package identifier"
+    },
+    "workspace_id": {
+      "type": "string",
+      "description": "Associated workspace identifier"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of the package"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "approved", "exported", "handoff_submitted"],
+      "description": "Package status lifecycle"
+    },
+    "approved_by": {
+      "type": ["string", "null"],
+      "description": "Actor ID of approver"
+    },
+    "approved_at": {
+      "type": ["string", "null"],
+      "description": "ISO 8601 timestamp of approval"
+    },
+    "package_hash": {
+      "type": "string",
+      "description": "SHA256 digest of package contents"
+    },
+    "artifact_reference_id": {
+      "type": ["string", "null"],
+      "description": "Reference to associated artifact"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["created_by", "created_at", "updated_at"],
+      "properties": {
+        "created_by": {
+          "type": "string",
+          "description": "Actor ID of package creator"
+        },
+        "created_at": {
+          "type": "string",
+          "description": "ISO 8601 creation timestamp"
+        },
+        "updated_at": {
+          "type": "string",
+          "description": "ISO 8601 last update timestamp"
+        },
+        "description": {
+          "type": ["string", "null"],
+          "description": "Human-readable package description"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Classification tags"
+        }
+      }
+    },
+    "approval_chain": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["approved_by", "approved_at", "approval_type"],
+        "properties": {
+          "approved_by": {
+            "type": "string"
+          },
+          "approved_at": {
+            "type": "string"
+          },
+          "approval_type": {
+            "type": "string",
+            "enum": ["section_review", "handoff_approval"]
+          },
+          "comment": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "description": "Approval history"
+    },
+    "package_readiness_details": {
+      "type": "object",
+      "required": [
+        "required_sections_complete",
+        "all_sections_approved",
+        "traceability_density",
+        "blocking_risks_resolved",
+        "validation_passed"
+      ],
+      "properties": {
+        "required_sections_complete": {
+          "type": "boolean"
+        },
+        "all_sections_approved": {
+          "type": "boolean"
+        },
+        "traceability_density": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Fraction of sections with traceability"
+        },
+        "blocking_risks_resolved": {
+          "type": "boolean"
+        },
+        "validation_passed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "delivery_target": {
+      "type": "object",
+      "required": ["handoff_format", "bolt_target", "expected_consumer"],
+      "properties": {
+        "handoff_format": {
+          "type": "string",
+          "enum": ["canvas.bolt_handoff.v0.1"]
+        },
+        "bolt_target": {
+          "type": "string",
+          "description": "Target deployment system (e.g., cos-matic)"
+        },
+        "expected_consumer": {
+          "type": "string",
+          "description": "Expected consumer of the handoff"
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "package_id",
+          "section_id",
+          "revision_id",
+          "section_key",
+          "required"
+        ]
+      },
+      "description": "Package items (sections)"
+    },
+    "readiness": {
+      "type": "object",
+      "required": [
+        "status",
+        "traceability_links",
+        "blocking_questions",
+        "high_risks",
+        "created_at"
+      ],
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "traceability_links": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blocking_questions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "high_risks": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "created_at": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

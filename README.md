@@ -51,11 +51,11 @@ The local Rust CLI can create a sample workspace, build a package and handoff, v
 
 ## Not scale-ready yet
 
-This is not a full product workspace yet: the core contract path exists, but the durable UI, complete schema, completeness inspection, and team workflow hardening are still missing.
+This is not a full product workspace yet: the core contract path exists, but the durable UI and team workflow hardening are still missing. Schema stabilization (spec-package.v0.1.schema.json, I4) and Wrench completeness checks (I3) are now in place.
 
 ## Next product milestone
 
-Stabilize the `SpecPackage` contract and wire Wrench checks so a Canvas handoff can be inspected before planning.
+Multi-actor workspace support via the workspace-identity.v0.1 contract (I1–I2 proven with Biscuit fixture), persistent storage with provenance, and durable UI for team workflows.
 
 ## Purpose
 
