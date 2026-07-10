@@ -10,4 +10,5 @@ rumble-canvas-package = { path = "../package" }
 serde.workspace = true
 serde_json.workspace = true
 sha2.workspace = true
+tempfile = "3"
 thiserror.workspace = true

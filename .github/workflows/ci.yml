@@ -29,7 +29,12 @@ jobs:
       - name: Clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Install wrench-inspect
+        # No continue-on-error: a silent install failure would skip the
+        # integration test below and leave the wrench gate decorative.
         run: cargo install --git https://github.com/constantin-jais/wrench-inspect.git --rev 973bd76a22c84003ec4f5c3a4379f9c93fe35278
-        continue-on-error: true
       - name: Test
         run: cargo test --workspace --all-targets
+      - name: Wrench integration test
+        # The test is #[ignore]d so local runs without wrench-inspect stay
+        # green; CI installs the binary above, so it must actually run here.
+        run: cargo test -p rumble-canvas-handoff --test wrench_integration_test -- --ignored

@@ -2,12 +2,21 @@
 
 ## Overview
 
-Canvas integrates `wrench-inspect` to run completeness checks on `SpecPackage` before planning. Checks validate:
+Canvas integrates `wrench-inspect` to run completeness checks before planning.
+The unit of inspection is the `canvas.bolt_handoff.v0.1` document
+(`kind: planning_request`): `wrench check` builds the handoff from the stored
+workspace and the latest `SpecPackage`, writes it to a temporary file, and runs
+`wrench-inspect handoff inspect --json <file>`.
 
-- **Contract validation** — Package structure matches workspace-identity.v0.1 contract.
-- **Schema validation** — All required fields are present and typed correctly.
-- **Traceability completeness** — Every section has ≥1 traceability link.
-- **Role coverage** — All roles in the workspace have explicit permissions.
+The checks are wrench-inspect's own handoff inspections:
+
+- **Structure** — `kind` must be `planning_request`; required
+  `ImplementationHandoff` fields (source, package version/hash, …) present.
+- **Execution policy** — human approval for execution must be required.
+- **Traceability** — every traceability reference resolves to an object
+  present in the handoff context (screens, actions, sections, …).
+- **Waiver separation** — waiver owner and reviewer must be distinct actors.
+- **Risks / blockers / capabilities** — declared sections are well-formed.
 
 ## Usage
 
@@ -15,32 +24,49 @@ Canvas integrates `wrench-inspect` to run completeness checks on `SpecPackage` b
 cargo run -p rumble-canvas -- wrench check --store target/canvas.json
 ```
 
-Output:
+Output (stderr carries findings, stdout the verdict):
 
 ```
 Running wrench completeness checks...
-contract_validation: PASS
-schema_validation: PASS
-traceability: PASS
-role_coverage: PASS
+summary: 0 error(s), 0 warning(s), 0 info(s)
 ✓ All wrench checks passed
 ```
 
-## Failure Modes
+On failure the command exits non-zero and each non-info finding is printed as
+`SEVERITY code at path: message (recommendation)`.
 
-- **contract_validation: FAIL** — Package does not conform to workspace-identity.v0.1.
-- **schema_validation: FAIL** — Required fields missing or mistyped.
-- **traceability: WARN** — Some sections lack traceability links (non-blocking for MVP).
+## Report shape
+
+`wrench-inspect handoff inspect --json` prints a report on stdout, then exits
+`0` when `valid` and `1` otherwise (the report is printed in both cases):
+
+```json
+{
+  "valid": true,
+  "summary": { "errors": 0, "warnings": 0, "infos": 0 },
+  "findings": [],
+  "coverage": { "...": "..." },
+  "next_actions": []
+}
+```
+
+`crates/handoff/src/wrench_integration.rs` deserializes this into
+`WrenchReport` (ignoring `coverage`) and treats an invalid handoff as a
+report, not a process error.
 
 ## Installation
 
-`wrench-inspect` is installed automatically in CI via the workflow. For local development:
+`wrench-inspect` is installed automatically in CI via the workflow. For local
+development:
 
 ```bash
 cargo install --git https://github.com/constantin-jais/wrench-inspect.git --rev 973bd76a22c84003ec4f5c3a4379f9c93fe35278
 ```
 
-If `wrench-inspect` is not available, the `wrench check` command gracefully skips checks with a warning.
+If `wrench-inspect` is not available, the `wrench check` command gracefully
+skips checks with a warning. The integration test
+(`crates/handoff/tests/wrench_integration_test.rs`) is `#[ignore]`d for the
+same reason; CI installs the binary and runs it explicitly with `-- --ignored`.
 
 ## Future Extensions
 
