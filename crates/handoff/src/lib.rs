@@ -8,6 +8,8 @@ use thiserror::Error;
 pub mod token_sealer;
 pub use token_sealer::{seal_workspace_identity_token, verify_workspace_authorization};
 
+pub mod wrench_integration;
+
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum HandoffError {
     #[error("execution is forbidden from Canvas MVP")]
