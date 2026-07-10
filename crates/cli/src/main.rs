@@ -9,6 +9,8 @@ use rumble_canvas_package::build_package;
 use rumble_canvas_store::{handoff_id, CanvasStore, JsonFileStore, StoredReport};
 use serde_json::Value;
 
+mod commands;
+
 #[derive(Debug, Parser)]
 #[command(name = "rumble-canvas")]
 #[command(
@@ -32,6 +34,10 @@ enum TopCommand {
     Handoff {
         #[command(subcommand)]
         action: HandoffAction,
+    },
+    Wrench {
+        #[command(subcommand)]
+        cmd: commands::wrench::WrenchCommand,
     },
 }
 
@@ -114,6 +120,7 @@ fn main() -> Result<()> {
                 json,
             } => run_and_maybe_store(&["handoff", "plan"], payload, store, json),
         },
+        TopCommand::Wrench { cmd } => commands::handle_wrench(cmd),
     }
 }
 

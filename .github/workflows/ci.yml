@@ -28,5 +28,8 @@ jobs:
         run: cargo check --workspace --all-targets
       - name: Clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Install wrench-inspect
+        run: cargo install --git https://github.com/constantin-jais/wrench-inspect.git --rev 973bd76a22c84003ec4f5c3a4379f9c93fe35278
+        continue-on-error: true
       - name: Test
         run: cargo test --workspace --all-targets
