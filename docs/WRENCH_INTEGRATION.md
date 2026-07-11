@@ -60,7 +60,12 @@ report, not a process error.
 development:
 
 ```bash
-cargo install --git https://github.com/constantin-jais/wrench-inspect.git --rev 973bd76a22c84003ec4f5c3a4379f9c93fe35278
+WRENCH_REV=cd430ba1a9dec4ccd85ac865a2ba1fbed58d8c03
+curl --fail --location --retry 3 \
+  "https://github.com/libre-ai/wrench/archive/$WRENCH_REV.tar.gz" \
+  --output "/tmp/wrench-$WRENCH_REV.tar.gz"
+tar -xzf "/tmp/wrench-$WRENCH_REV.tar.gz" -C /tmp
+cargo install --locked --path "/tmp/wrench-$WRENCH_REV/inspect"
 ```
 
 If `wrench-inspect` is not available, the `wrench check` command gracefully
