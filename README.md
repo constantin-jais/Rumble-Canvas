@@ -40,7 +40,7 @@ crates/store    local persistence adapter
 crates/cli      package, validation and planning-only commands
 ```
 
-The `spec-package.v0.1` schema and Wrench integration notes are versioned in this repository.
+The `spec-package.v0.1` schema and Proof Kit integration notes are versioned in this repository.
 
 - [`docs/OPERATIONS.md`](docs/OPERATIONS.md)
 - [`docs/WRENCH_INTEGRATION.md`](docs/WRENCH_INTEGRATION.md)

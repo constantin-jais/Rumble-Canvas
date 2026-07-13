@@ -1,9 +1,9 @@
-# Wrench Integration — Canvas Completeness Checks
+# Proof Kit integration — Spec Studio completeness checks
 
 ## Overview
 
-Canvas integrates `wrench-inspect` to run completeness checks before planning.
-The unit of inspection is the `canvas.bolt_handoff.v0.1` document
+Spec Studio integrates the Proof Kit binary `wrench-inspect` to run completeness checks before planning.
+The unit of inspection is the compatibility contract `canvas.bolt_handoff.v0.1`
 (`kind: planning_request`): `wrench check` builds the handoff from the stored
 workspace and the latest `SpecPackage`, writes it to a temporary file, and runs
 `wrench-inspect handoff inspect --json <file>`.
@@ -68,13 +68,14 @@ tar -xzf "/tmp/wrench-$WRENCH_REV.tar.gz" -C /tmp
 cargo install --locked --path "/tmp/proof-kit-$WRENCH_REV/inspect"
 ```
 
-If `wrench-inspect` is not available, the `wrench check` command gracefully
-skips checks with a warning. The integration test
+If `wrench-inspect` is not available, the local `wrench check` command is advisory and
+skips checks with a visible warning; it must never be presented as a passed gate. The integration test
 (`crates/handoff/tests/wrench_integration_test.rs`) is `#[ignore]`d for the
-same reason; CI installs the binary and runs it explicitly with `-- --ignored`.
+same reason. Protected CI installs the pinned binary and runs the test explicitly with `-- --ignored`,
+so the release gate does not use the advisory fallback.
 
 ## Future Extensions
 
-- Artifact reference validation (gear-depot linkage).
-- Permission matrix validation (crew-specific).
-- Sector-wide checks (multi-repo).
+- Artifact reference validation through Artifact Supply manifests.
+- Mission permission validation at the Agent Board boundary.
+- Portfolio-wide checks across repositories.
