@@ -19,6 +19,6 @@ This is a contribution map, not a startup roadmap or a delivery promise. It show
 
 ## Later
 
-- broader integrations with Wrench and Bolt;
+- broader integrations with Proof Kit and Agent Factory;
 - release provenance for generated specs;
 - multi-user product usage only when workflow and permission boundaries are explicit.
