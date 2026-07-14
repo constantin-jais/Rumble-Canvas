@@ -1,6 +1,6 @@
 # Roadmap
 
-This is a contribution map, not a startup roadmap or a delivery promise. It shows where help is useful while keeping scope explicit.
+This is a contribution map, not a startup roadmap or a delivery promise. It shows where help is useful while keeping scope explicit. The canonical status snapshot is the [product readiness cockpit](docs/product-readiness.md).
 
 ## Now
 

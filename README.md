@@ -15,7 +15,7 @@ A product-conception workspace for turning conversations into decisions, specs a
 | Not available yet | durable collaborative UI and production multi-actor workflow |
 | Historical IDs | `rumble-canvas` remains the current crate/CLI identifier |
 
-The CLI proves a bounded handoff path. It does not make Spec Studio a complete product or grant it execution ownership.
+The CLI proves a bounded handoff path. It does not make Spec Studio a complete product or grant it execution ownership. See the canonical [product readiness cockpit](docs/product-readiness.md).
 
 ## Local proof
 
