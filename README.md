@@ -1,69 +1,77 @@
-> [!WARNING]
-> **Frozen on 2026-07-16 — reserved as the future home of Spec Studio ([monorepo ADR-0008](https://github.com/libre-ai/libre-ai/blob/main/docs/adr/0008-multi-repo-target-topology-and-brand.md)).**
-> Spec Studio is being rebuilt from locked contracts in the canonical base repository [`libre-ai/libre-ai`](https://github.com/libre-ai/libre-ai) (target: `apps/specifications`). This repository will reopen as the real product repository when the owner activates it. Everything below describes the pre-freeze state and no longer reflects the current architecture or roadmap.
+**English** · [Français](README.fr.md)
 
-<p align="center">
-  <img src=".github/assets/repository-card.svg" alt="Libre AI Spec Studio, represented by connected product frames, flows and decisions." width="100%">
-</p>
+> [!NOTE]
+> **Reserved · future home of Spec Studio** — rebuilt in the canonical base repository [`libre-ai/libre-ai`](https://github.com/libre-ai/libre-ai) ([multi-repo topology, ADR-0008](https://github.com/libre-ai/libre-ai/blob/main/docs/adr/0008-multi-repo-target-topology-and-brand.md)).
+> This repository will reopen as the real product repository when the owner activates it, consuming the base as a versioned dependency. The foundations described below are **being built now** — with links to the code that already exists.
 
-# Libre AI Spec Studio
+# Spec Studio
 
-A product-conception workspace for turning conversations into decisions, specs and implementation handoffs.
+**Contract-first product workspace for turning conversations into decisions, specs, and planning handoffs.** Create an intent; add requirements, decisions, and sourced contracts; freeze an immutable, content-addressed **SpecPackage** with approvals and evidence; emit a planning-only handoff that downstream planners consume without execution capability. Never silent, always traceable — every package is locked by rule, never mutated.
 
-## Status
+The canonical brief it answers: _"we talk about it, we decide it, we write it, we hand it off"_ — a bounded, self-contained workspace that makes every step explicit and every participant's role distinct (author, reviewer, approver). Both internal reasoning and external handoff are first-class products, independently versionable.
 
-| | |
-| --- | --- |
-| Maturity | **Contract-first** |
-| Works today | local Rust CLI for workspace, package, validation and planning-only handoff |
-| Not available yet | durable collaborative UI and production multi-actor workflow |
-| Historical IDs | `rumble-canvas` remains the current crate/CLI identifier |
+## Why it's different
 
-The CLI proves a bounded handoff path. It does not make Spec Studio a complete product or grant it execution ownership. See the canonical [product readiness cockpit](docs/product-readiness.md).
+- **Contract-first, not markdown.** A spec is not a document — it is a structured SpecPackage containing problem, actors, requirements (each with priority), sourced contracts, decision records, risk mitigations, and acceptance criteria with observable evidence. Markdown lives inside the evidence field, never as the package itself.
+- **Immutable accepted state.** An accepted package is content-addressed by digest and **never** mutated. Approval creates a named lineage edge; supersession starts a new version, never a patch.
+- **Deny by default on completeness.** Missing problem, open decisions, unmapped contracts across boundaries, unverifiable criteria, or inadequate approvals (no separation) block acceptance. Validation returns stable rule IDs; it never fills blanks automatically.
+- **Handoff is a separate capability.** Planning-only handoff carries the accepted package reference and evidence, grants zero execution rights, and includes a Biscuit attestation verifying hash and audience. Planner reads; planner never runs.
+- **Real-time collaboration, frozen on submission (planned).** The design ([#198](https://github.com/libre-ai/libre-ai/pull/198), owner-signed) has authors and reviewers co-edit the DRAFT workspace in real time through end-to-end-encrypted MLS — Libre AI's sovereign collaboration brick, still to be implemented — and freeze the CRDT to append-only comment threads once submitted for review.
 
-## Local proof
+## Status — spec-published, foundations under construction
 
-```bash
-cargo run -p rumble-canvas -- workspace sample --store target/canvas.json
-cargo run -p rumble-canvas -- package build --store target/canvas.json --out target/package.json
-cargo run -p rumble-canvas -- handoff build --store target/canvas.json --out target/handoff.json
-cargo run -p rumble-canvas -- handoff validate --store target/canvas.json --json
-cargo run -p rumble-canvas -- handoff plan --store target/canvas.json --json
-cargo test --workspace
-```
+Spec Studio is being rebuilt from locked contracts. It is **not released yet**; the domain and acceptance logic come first, and a good part of it already exists and is proven in the base repository:
 
-`handoff plan` is always dry-run. Spec Studio describes intent and packages validated context; it does not execute implementation work.
+| Foundation                                                        | State               | Evidence                                                                                                                                                                                                                                                                              |
+| ----------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`spec-package.v1`** — content-addressed immutable schema        | ✅ built, validated | Contract and golden vectors ([specs.v1.schema.json](https://github.com/libre-ai/libre-ai/blob/main/contracts/schemas/spec-package.v1.schema.json))                                                                                                                                    |
+| **`agent-handoff.v1`**, **`evidence-report.v1`** — exports        | ✅ built, validated | Planning-only handoff and evidence schemas ([agent-handoff.v1](https://github.com/libre-ai/libre-ai/blob/main/contracts/schemas/agent-handoff.v1.schema.json), [evidence-report.v1](https://github.com/libre-ai/libre-ai/blob/main/contracts/schemas/evidence-report.v1.schema.json)) |
+| **Workspace lifecycle aggregate** — frame, submit, accept         | ✅ built, tested    | Domain logic, RLS protections, append-only events (#172)                                                                                                                                                                                                                              |
+| **Accepted spec-package validator** — completeness rules          | ✅ built, tested    | Deny-by-default validator matching SpecPackage v1 schema (#166)                                                                                                                                                                                                                       |
+| **Spec-workspace persistence** — PostgreSQL, snapshots + events   | ✅ built, tested    | Tenant-scoped, RLS, immutable accept, migration 0001 (#176)                                                                                                                                                                                                                           |
+| **Command service** — write path orchestration                    | ✅ built, tested    | Composes domain logic and persistence for all lifecycle operations (#177)                                                                                                                                                                                                             |
+| **Acceptance seam** — decision gate + validation                  | ✅ built, tested    | Pure `decideAcceptance()` + persisted transition, refusal handling (#178)                                                                                                                                                                                                             |
+| **Content-addressed spec-packages store** — dedicated persistence | ✅ built, tested    | Idempotent storage, digest conflicts refused, immutable append-only (#201)                                                                                                                                                                                                            |
+| **Read-only cockpit** — SSR server-rendered view                  | ✅ built, tested    | Workspace list and details; authoring UI arrives next (#180)                                                                                                                                                                                                                          |
+| Authoring UI (frame/requirement/contract/review)                  | ⏳ next             | Create and edit DRAFT workspaces, add requirements, record decisions and contracts                                                                                                                                                                                                    |
+| Command surface authorization (Biscuit, tenant isolation)         | ⏳ next             | Author/review/approve/export operations, handoff capability attenuation                                                                                                                                                                                                               |
+| Planning-only consumer conformance                                | ⏳ ahead            | Missions/orchestrator integration, handoff verification                                                                                                                                                                                                                               |
+| Concurrency and rollback qualification                            | ⏳ ahead            | Conflict resolution, safe timetravel, evidence immutability guarantee                                                                                                                                                                                                                 |
 
-## Architecture
+This repository is `private` until a secrets audit clears it for public reopening (wave 4). **Benchmark target:** workflow and specification governance tooling (e.g. Notion, Figma design specs) — reached through explicit contract-first structure rather than freeform documents.
 
-```text
-crates/domain   product workspace and traceability
-crates/package  SpecPackage readiness, hashing and immutability
-crates/handoff  bounded ImplementationHandoff generation
-crates/store    local persistence adapter
-crates/cli      package, validation and planning-only commands
-```
+## How it works
 
-The `spec-package.v0.1` schema and Proof Kit integration notes are versioned in this repository.
+1. **Frame** — author creates a workspace with problem statement, actors, constraints, and initial hypotheses. The workspace opens in DRAFT mode; all fields are mutable. Validation exposes missing problem, actors, or required decisions immediately.
+2. **Specify and review** — author adds requirements (with priority), sourced contracts for cross-boundary dependencies, risk mitigations, and acceptance criteria with observable evidence. Reviewers read and comment; when ready, author submits the package for review. In the signed design, when `collab_enabled`, editor and reviewers share a real-time encrypted workspace (MLS per-epoch keys) and the CRDT freezes to append-only comments on submit — the collaboration brick that carries this is planned, not yet built.
+3. **Accept** — approver invokes the acceptance seam: completeness validation runs (problem, actors, requirements, contracts, risks, criteria, approval separation), and on success, the workspace freezes into an immutable, content-addressed **SpecPackage** with digest and approval signatures. Supersession links the new version to the old one; past versions are never rewritten.
+4. **Handoff** — authorized user emits a planning-only handoff: a message carrying the accepted package hash, evidence references, and Biscuit attestation. Downstream planner loads the handoff, verifies the digest, and consumes the spec for planning — never for execution or mutation.
 
-- [`docs/OPERATIONS.md`](docs/OPERATIONS.md)
-- [`docs/WRENCH_INTEGRATION.md`](docs/WRENCH_INTEGRATION.md)
-- [`specs/spec-package.v0.1.schema.json`](specs/spec-package.v0.1.schema.json)
+## Architecture — built from interoperable bricks
 
-## Boundaries
+Spec Studio is a product assembled from independently versioned bricks; each is usable and testable on its own, and the product is their composition (the multi-repo target of [ADR-0008](https://github.com/libre-ai/libre-ai/blob/main/docs/adr/0008-multi-repo-target-topology-and-brand.md)).
 
-Spec Studio owns product meaning: assumptions, screens, flows, decisions and human validation. Independent infrastructure owns orchestration, inspection, persistence substrate and distribution. Handoffs are explicit and reviewable.
+| Brick                                        | Role                                  | Interface it exposes / consumes                                                                                  |
+| -------------------------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **`spec-package.v1`** (JSON Schema + golden) | The immutable specification structure | Content-addressed by SHA-256 digest; validator returns rule IDs; no mutation API                                 |
+| **`@libre-ai/web-platform`**                 | SSR / Bun BFF foundation              | Request handler, server-rendered cockpit view, accessibility-first markup                                        |
+| **`@libre-ai/data`**                         | PostgreSQL persistence layer          | Workspace lifecycle store, append-only events, content-addressed spec-packages, RLS                              |
+| **Contracts**                                | Locked interoperability surface       | `spec-package.v1`, `agent-handoff.v1`, `evidence-report.v1` schemas, `specifications.v1` OpenAPI, golden vectors |
 
-## Next milestone
+The authorizing host passes canonical specification bytes to the validator; the validator returns rule-by-rule evidence. Any consumer that speaks the same contracts can read and verify the package.
 
-Add durable multi-actor identity and provenance while preserving planning-only semantics.
+## Where the work happens
 
-## Contributing
+All active development is in the base repository, under:
 
-- [Contribution guide](CONTRIBUTING.md)
-- [Roadmap](ROADMAP.md)
-- [Security policy](SECURITY.md)
+- `apps/specifications` — the product host (SSR cockpit, command service, persistence)
+- `contracts/schemas/spec-package.v1.schema.json` — the immutable SpecPackage definition
+- `contracts/schemas/agent-handoff.v1.schema.json`, `evidence-report.v1.schema.json` — handoff and evidence contracts
+- `contracts/openapi/specifications.v1.yaml` — the API surface
+- [`docs/apps/specifications.md`](https://github.com/libre-ai/libre-ai/blob/main/docs/apps/specifications.md) — the full product brief
+
+To follow progress or contribute, open issues and pull requests in [`libre-ai/libre-ai`](https://github.com/libre-ai/libre-ai). This repository stays reserved until activation.
 
 ## License
 
-[MIT](LICENSE).
+EUPL-1.2.
