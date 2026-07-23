@@ -38,7 +38,7 @@ Spec Studio est reconstruit à partir de contrats verrouillés. Il **n'est pas e
 | Conformité du consommateur réservé au planification                                 | ⏳ avancé            | Intégration Missions/orchestrateur, vérification de remise                                                                                                                                                                                                                                          |
 | Qualification de concurrence et de rollback                                         | ⏳ avancé            | Résolution de conflits, timetravel sûr, garantie d'immuabilité des preuves                                                                                                                                                                                                                          |
 
-Ce dépôt est `private` jusqu'à ce qu'un audit de secrets autorise sa réouverture publique (vague 4). **Cible de référence :** outillage de gouvernance de flux de travail et de spécification (p. ex. Notion, Figma design specs) — atteinte par une structure explicitement pilotée par les contrats plutôt que par des documents libres.
+Ce dépôt est une réserve publique, volontairement sans code produit jusqu'à l'activation (vague 4). **Cible de référence :** outillage de gouvernance de flux de travail et de spécification (p. ex. Notion, Figma design specs) — atteinte par une structure explicitement pilotée par les contrats plutôt que par des documents libres.
 
 ## Comment ça fonctionne
 

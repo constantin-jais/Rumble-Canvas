@@ -38,7 +38,7 @@ Spec Studio is being rebuilt from locked contracts. It is **not released yet**; 
 | Planning-only consumer conformance                                | ⏳ ahead            | Missions/orchestrator integration, handoff verification                                                                                                                                                                                                                               |
 | Concurrency and rollback qualification                            | ⏳ ahead            | Conflict resolution, safe timetravel, evidence immutability guarantee                                                                                                                                                                                                                 |
 
-This repository is `private` until a secrets audit clears it for public reopening (wave 4). **Benchmark target:** workflow and specification governance tooling (e.g. Notion, Figma design specs) — reached through explicit contract-first structure rather than freeform documents.
+This repository is a public reserved home, intentionally without product code until activation (wave 4). **Benchmark target:** workflow and specification governance tooling (e.g. Notion, Figma design specs) — reached through explicit contract-first structure rather than freeform documents.
 
 ## How it works
 
